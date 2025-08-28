@@ -13,8 +13,6 @@ public class ShippingCalculator {
      */
     private static final Double MIN_SHIPPING_AMOUNT = 400.0;
 
-    //TODO поменять Exception на подходящие
-
     /**
      * Расчёт стоимости доставки. Минимальная стоимость доставки: {@link ShippingCalculator#MIN_SHIPPING_AMOUNT}
      *
@@ -23,17 +21,17 @@ public class ShippingCalculator {
      * @param isFragile      хрупкость груза. Если груз хрупкий, тогда {@code true}
      * @param workloadStatus агруженности службы доставки
      * @return итоговая стоимость доставки
-     * @throws Exception если значение поля {@code range} отрицательное
-     * @throws Exception если хрупкий груз провозится на недопустимое расстояние
+     * @throws IllegalArgumentException если значение поля {@code range} отрицательное
+     * @throws IllegalArgumentException если хрупкий груз провозится на недопустимое расстояние
      */
-    public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) throws Exception {
+    public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) {
         // Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
         if (range < 0) {
-            throw new Exception("Ошибка валидации: поле [range] должно быть положительным");
+            throw new IllegalArgumentException("Ошибка валидации: поле [range] должно быть положительным");
         }
 
         if (isFragile && range > 30) {
-            throw new Exception("Ошибка: хрупкие грузы нельзя возить на расстояние более 30 км");
+            throw new IllegalArgumentException("Ошибка валидации: хрупкие грузы нельзя возить на расстояние более 30 км");
         }
 
         double amount = 0;
