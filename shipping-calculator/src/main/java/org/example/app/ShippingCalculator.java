@@ -19,13 +19,13 @@ public class ShippingCalculator {
      * @param range          расстояния до пункта назначения указывается в километрах
      * @param dimensionType  тип габаритов груза
      * @param isFragile      хрупкость груза. Если груз хрупкий, тогда {@code true}
-     * @param workloadStatus агруженности службы доставки
+     * @param workloadStatus статус загруженности службы доставки
      * @return итоговая стоимость доставки
      * @throws IllegalArgumentException если значение поля {@code range} отрицательное
      * @throws IllegalArgumentException если хрупкий груз провозится на недопустимое расстояние
      */
     public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) {
-        // Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
+        //TODO Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
         if (range < 0) {
             throw new IllegalArgumentException("Ошибка валидации: поле [range] должно быть положительным");
         }
@@ -36,12 +36,9 @@ public class ShippingCalculator {
 
         double amount = 0;
 
-        amount += getSumByRange(range);
+        amount += geRangeCost(range);
 
-        amount += switch (dimensionType) {
-            case BIG -> 200;
-            case SMALL -> 100;
-        };
+        amount += dimensionType.getCost();
 
         if (isFragile) {
             amount += 300;
@@ -58,12 +55,11 @@ public class ShippingCalculator {
      * @param range расстояния до пункта назначения указывается в километрах
      * @return стоимость надбавки к стоимости доставки по расстоянию
      */
-    private static Double getSumByRange(Double range) {
-        /*Требуется уточнение, фрагмент задачи:
-        - более 30 км: +300 рублей к доставке;
-        - до 30 км: +200 рублей к доставке;
-
-        Неоднозначно куда входить значение равное 30
+    private static Double geRangeCost(Double range) {
+        /* TODO Требуется уточнение, фрагмент задачи:
+                - более 30 км: +300 рублей к доставке;
+                - до 30 км: +200 рублей к доставке;
+                Неоднозначно куда входить значение равное 30
          */
         if (range > 30) {
             return 300.0;
