@@ -2,6 +2,8 @@ package org.example.app;
 
 import org.example.app.enums.DimensionType;
 import org.example.app.enums.WorkloadStatus;
+import org.example.app.exceptions.FragileRangeException;
+import org.example.app.exceptions.InvalidRangeException;
 
 /**
  * Статический класс для расчёта стоимости доставки груза
@@ -12,6 +14,10 @@ public class ShippingCalculator {
      * Минимальная стоимость доставки
      */
     private static final Double MIN_SHIPPING_AMOUNT = 400.0;
+    /**
+     * Максимальная длина для доставки хрупкого груза
+     */
+    private static final Double MAX_RANGE_FOR_IS_FRAGILE = 30.0;
 
     /**
      * Расчёт стоимости доставки. Минимальная стоимость доставки: {@link ShippingCalculator#MIN_SHIPPING_AMOUNT}
@@ -21,17 +27,17 @@ public class ShippingCalculator {
      * @param isFragile      хрупкость груза. Если груз хрупкий, тогда {@code true}
      * @param workloadStatus статус загруженности службы доставки
      * @return итоговая стоимость доставки
-     * @throws IllegalArgumentException если значение поля {@code range} отрицательное
-     * @throws IllegalArgumentException если хрупкий груз провозится на недопустимое расстояние
+     * @throws InvalidRangeException если значение поля {@code range} отрицательное
+     * @throws FragileRangeException если хрупкий груз провозится на недопустимое расстояние
      */
     public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) {
         //TODO Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
         if (range < 0) {
-            throw new IllegalArgumentException("Ошибка валидации: поле [range] должно быть положительным");
+            throw new InvalidRangeException();
         }
 
-        if (isFragile && range > 30) {
-            throw new IllegalArgumentException("Ошибка валидации: хрупкие грузы нельзя возить на расстояние более 30 км");
+        if (isFragile && range > MAX_RANGE_FOR_IS_FRAGILE) {
+            throw new FragileRangeException(MAX_RANGE_FOR_IS_FRAGILE);
         }
 
         double amount = 0;

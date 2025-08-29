@@ -5,6 +5,8 @@ import io.qameta.allure.Story;
 import org.example.app.ShippingCalculator;
 import org.example.app.enums.DimensionType;
 import org.example.app.enums.WorkloadStatus;
+import org.example.app.exceptions.FragileRangeException;
+import org.example.app.exceptions.InvalidRangeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +25,7 @@ public class NegativeTestCase {
         WorkloadStatus workloadStatus = WorkloadStatus.DEFAULT;
 
         assertThrows(
-                IllegalArgumentException.class,
+                InvalidRangeException.class,
                 () -> ShippingCalculator.calculateAmount(range, dimensionType, isFragile, workloadStatus),
                 "Валидация неверного значения успешно прошла");
     }
@@ -38,7 +40,7 @@ public class NegativeTestCase {
         WorkloadStatus workloadStatus = WorkloadStatus.DEFAULT;
 
         assertThrows(
-                IllegalArgumentException.class,
+                FragileRangeException.class,
                 () -> ShippingCalculator.calculateAmount(range, dimensionType, isFragile, workloadStatus),
                 "Валидация неверного значения успешно прошла");
     }
