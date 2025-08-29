@@ -4,11 +4,18 @@ import org.example.app.enums.DimensionType;
 import org.example.app.enums.WorkloadStatus;
 import org.example.app.exceptions.FragileRangeException;
 import org.example.app.exceptions.InvalidRangeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Статический класс для расчёта стоимости доставки груза
  */
 public class ShippingCalculator {
+
+    /**
+     * Логирование SLF4J
+     */
+    private static final Logger log = LoggerFactory.getLogger(ShippingCalculator.class);
 
     /**
      * Минимальная стоимость доставки
@@ -31,26 +38,33 @@ public class ShippingCalculator {
      * @throws FragileRangeException если хрупкий груз провозится на недопустимое расстояние
      */
     public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) {
+        log.info("Начат расчёт стоимости доставки..");
+
         //TODO Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
         if (range < 0) {
+            log.debug("Расчёт прерван. [range={}] < 0", range);
             throw new InvalidRangeException();
         }
-
         if (isFragile && range > MAX_RANGE_FOR_IS_FRAGILE) {
+            log.debug("Расчёт прерван. недопустимое расстояние для хрупкого груза: [range={}] > {}", range, MAX_RANGE_FOR_IS_FRAGILE);
             throw new FragileRangeException(MAX_RANGE_FOR_IS_FRAGILE);
         }
 
         double amount = 0;
 
         amount += geRangeCost(range);
+        log.info("Расчёта по параметру [Расстояние доставки], текущая стоимость доставки {}", amount);
 
         amount += dimensionType.getCost();
+        log.info("Расчёт по параметру [Габарит груза], текущая стоимость доставки: {}", amount);
 
         if (isFragile) {
             amount += 300;
         }
+        log.info("Расчёт по параметру [Хрупкость товара], текущая стоимость доставки: {}", amount);
 
         amount *= workloadStatus.getRatio();
+        log.info("Расчёт по параметру [Загруженность доставки], текущая стоимость доставки: {}", amount);
 
         return amount > MIN_SHIPPING_AMOUNT ? amount : MIN_SHIPPING_AMOUNT;
     }

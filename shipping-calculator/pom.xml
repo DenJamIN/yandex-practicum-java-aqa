@@ -15,6 +15,7 @@
 
         <junit.version>5.10.3</junit.version>
         <allure.version>2.29.1</allure.version>
+        <logback.version>1.5.13</logback.version>
     </properties>
 
     <dependencyManagement>
@@ -36,12 +37,16 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
     </dependencies>
 
