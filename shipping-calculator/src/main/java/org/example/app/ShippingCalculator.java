@@ -2,6 +2,10 @@ package org.example.app;
 
 import org.example.app.enums.DimensionType;
 import org.example.app.enums.WorkloadStatus;
+import org.example.app.exceptions.FragileRangeException;
+import org.example.app.exceptions.InvalidRangeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Статический класс для расчёта стоимости доставки груза
@@ -9,9 +13,18 @@ import org.example.app.enums.WorkloadStatus;
 public class ShippingCalculator {
 
     /**
+     * Логирование SLF4J
+     */
+    private static final Logger log = LoggerFactory.getLogger(ShippingCalculator.class);
+
+    /**
      * Минимальная стоимость доставки
      */
-    private static final Double MIN_SHIPPING_AMOUNT = 400.0;
+    public static final Double MIN_SHIPPING_AMOUNT = 400.0;
+    /**
+     * Максимальная длина для доставки хрупкого груза
+     */
+    private static final Double MAX_RANGE_FOR_IS_FRAGILE = 30.0;
 
     /**
      * Расчёт стоимости доставки. Минимальная стоимость доставки: {@link ShippingCalculator#MIN_SHIPPING_AMOUNT}
@@ -19,35 +32,39 @@ public class ShippingCalculator {
      * @param range          расстояния до пункта назначения указывается в километрах
      * @param dimensionType  тип габаритов груза
      * @param isFragile      хрупкость груза. Если груз хрупкий, тогда {@code true}
-     * @param workloadStatus агруженности службы доставки
+     * @param workloadStatus статус загруженности службы доставки
      * @return итоговая стоимость доставки
-     * @throws IllegalArgumentException если значение поля {@code range} отрицательное
-     * @throws IllegalArgumentException если хрупкий груз провозится на недопустимое расстояние
+     * @throws InvalidRangeException если значение поля {@code range} отрицательное
+     * @throws FragileRangeException если хрупкий груз провозится на недопустимое расстояние
      */
     public static Double calculateAmount(Double range, DimensionType dimensionType, Boolean isFragile, WorkloadStatus workloadStatus) {
-        // Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
-        if (range < 0) {
-            throw new IllegalArgumentException("Ошибка валидации: поле [range] должно быть положительным");
-        }
+        log.info("Начат расчёт стоимости доставки..");
 
-        if (isFragile && range > 30) {
-            throw new IllegalArgumentException("Ошибка валидации: хрупкие грузы нельзя возить на расстояние более 30 км");
+        //TODO Требуется уточнение: валидным ли является значение 0. Так как адрес доставки может быть такой же
+        if (range < 0) {
+            log.debug("Расчёт прерван. [range={}] < 0", range);
+            throw new InvalidRangeException();
+        }
+        if (isFragile && range > MAX_RANGE_FOR_IS_FRAGILE) {
+            log.debug("Расчёт прерван. недопустимое расстояние для хрупкого груза: [range={}] > {}", range, MAX_RANGE_FOR_IS_FRAGILE);
+            throw new FragileRangeException(MAX_RANGE_FOR_IS_FRAGILE);
         }
 
         double amount = 0;
 
-        amount += getSumByRange(range);
+        amount += geRangeCost(range);
+        log.info("Расчёта по параметру [Расстояние доставки], текущая стоимость доставки {}", amount);
 
-        amount += switch (dimensionType) {
-            case BIG -> 200;
-            case SMALL -> 100;
-        };
+        amount += dimensionType.getCost();
+        log.info("Расчёт по параметру [Габарит груза], текущая стоимость доставки: {}", amount);
 
         if (isFragile) {
             amount += 300;
         }
+        log.info("Расчёт по параметру [Хрупкость товара], текущая стоимость доставки: {}", amount);
 
         amount *= workloadStatus.getRatio();
+        log.info("Расчёт по параметру [Загруженность доставки], текущая стоимость доставки: {}", amount);
 
         return amount > MIN_SHIPPING_AMOUNT ? amount : MIN_SHIPPING_AMOUNT;
     }
@@ -58,12 +75,11 @@ public class ShippingCalculator {
      * @param range расстояния до пункта назначения указывается в километрах
      * @return стоимость надбавки к стоимости доставки по расстоянию
      */
-    private static Double getSumByRange(Double range) {
-        /*Требуется уточнение, фрагмент задачи:
-        - более 30 км: +300 рублей к доставке;
-        - до 30 км: +200 рублей к доставке;
-
-        Неоднозначно куда входить значение равное 30
+    private static Double geRangeCost(Double range) {
+        /* TODO Требуется уточнение, фрагмент задачи:
+                - более 30 км: +300 рублей к доставке;
+                - до 30 км: +200 рублей к доставке;
+                Неоднозначно куда входить значение равное 30
          */
         if (range > 30) {
             return 300.0;
