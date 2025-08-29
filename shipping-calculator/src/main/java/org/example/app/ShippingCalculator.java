@@ -13,7 +13,7 @@ public class ShippingCalculator {
     /**
      * Минимальная стоимость доставки
      */
-    private static final Double MIN_SHIPPING_AMOUNT = 400.0;
+    public static final Double MIN_SHIPPING_AMOUNT = 400.0;
     /**
      * Максимальная длина для доставки хрупкого груза
      */
