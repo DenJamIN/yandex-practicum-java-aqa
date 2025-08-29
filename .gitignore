@@ -17,3 +17,4 @@ buildNumber.properties
 .classpath
 **/allure-results
 **/allure-report
+.idea
