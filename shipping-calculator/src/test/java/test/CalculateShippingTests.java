@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Feature("Расчёт суммы доставки")
-public class CalculateShippingTests {
+public class CalculateShippingTests extends BaseTest {
 
     @DisplayName("Расчёт суммы доставки")
     @ParameterizedTest

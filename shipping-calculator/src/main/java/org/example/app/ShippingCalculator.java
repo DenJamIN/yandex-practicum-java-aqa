@@ -53,20 +53,22 @@ public class ShippingCalculator {
         double amount = 0;
 
         amount += geRangeCost(range);
-        log.info("Расчёта по параметру [Расстояние доставки], текущая стоимость доставки {}", amount);
+        log.debug("Расчёта по параметру [Расстояние доставки], текущая стоимость доставки {}", amount);
 
         amount += dimensionType.getCost();
-        log.info("Расчёт по параметру [Габарит груза], текущая стоимость доставки: {}", amount);
+        log.debug("Расчёт по параметру [Габарит груза], текущая стоимость доставки: {}", amount);
 
         if (isFragile) {
             amount += 300;
         }
-        log.info("Расчёт по параметру [Хрупкость товара], текущая стоимость доставки: {}", amount);
+        log.debug("Расчёт по параметру [Хрупкость товара], текущая стоимость доставки: {}", amount);
 
         amount *= workloadStatus.getRatio();
-        log.info("Расчёт по параметру [Загруженность доставки], текущая стоимость доставки: {}", amount);
+        log.debug("Расчёт по параметру [Загруженность доставки], текущая стоимость доставки: {}", amount);
 
-        return amount > MIN_SHIPPING_AMOUNT ? amount : MIN_SHIPPING_AMOUNT;
+        amount = amount > MIN_SHIPPING_AMOUNT ? amount : MIN_SHIPPING_AMOUNT;
+        log.info("Итоговая стоимость доставки: {}", amount);
+        return amount;
     }
 
     /**

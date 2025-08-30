@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Feature("Исключения валидации")
-public class ThrowExceptionTests {
+public class ThrowExceptionTests extends BaseTest {
 
     @Story("Расстояние")
     @DisplayName("Отрицательное значение расстояния доставки")
